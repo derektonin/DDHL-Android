@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Widget colors, dark mode (the DDHL site's look). -->
+<resources>
+    <color name="w_bg">#F011151C</color>
+    <color name="w_border">#33F2C230</color>
+    <color name="w_text">#FFFFFF</color>
+    <color name="w_muted">#A7B0BE</color>
+    <color name="w_accent">#F2C230</color>
+    <color name="w_divider">#2AF2C230</color>
+</resources>

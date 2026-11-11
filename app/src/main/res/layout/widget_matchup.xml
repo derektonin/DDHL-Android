@@ -48,7 +48,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:maxLines="1"
-                    android:textColor="@color/ddhl_yellow"
+                    android:textColor="@color/w_accent"
                     android:textSize="15sp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -57,7 +57,7 @@
                 android:id="@+id/w_me_rec"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/ddhl_text"
+                android:textColor="@color/w_text"
                 android:textSize="26sp"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -67,7 +67,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="6dp"
             android:text="vs"
-            android:textColor="@color/ddhl_muted"
+            android:textColor="@color/w_muted"
             android:textSize="13sp" />
 
         <!-- Opponent -->
@@ -89,7 +89,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:maxLines="1"
-                    android:textColor="@color/ddhl_muted"
+                    android:textColor="@color/w_muted"
                     android:textSize="15sp"
                     android:textStyle="bold" />
 
@@ -107,7 +107,7 @@
                 android:id="@+id/w_opp_rec"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/ddhl_text"
+                android:textColor="@color/w_text"
                 android:textSize="26sp"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -141,7 +141,7 @@
             android:layout_weight="1"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textColor="@color/ddhl_text"
+            android:textColor="@color/w_text"
             android:textSize="14sp" />
     </LinearLayout>
 
@@ -152,6 +152,6 @@
         android:layout_marginTop="2dp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:textColor="@color/ddhl_muted"
+        android:textColor="@color/w_muted"
         android:textSize="12sp" />
 </LinearLayout>

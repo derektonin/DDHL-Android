@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Widget colors, light mode. Dark mode versions are in values-night/. -->
+<resources>
+    <color name="w_bg">#F5FFFFFF</color>
+    <color name="w_border">#40B08A1A</color>
+    <color name="w_text">#11151C</color>
+    <color name="w_muted">#5B6472</color>
+    <!-- Your team: darker gold so it reads on white -->
+    <color name="w_accent">#8A6400</color>
+    <color name="w_divider">#33B08A1A</color>
+</resources>

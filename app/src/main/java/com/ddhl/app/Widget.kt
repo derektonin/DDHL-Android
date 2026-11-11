@@ -5,14 +5,12 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.Typeface
 import android.os.Build
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.text.style.RelativeSizeSpan
-import android.text.style.StyleSpan
 import android.util.SizeF
 import android.util.TypedValue
 import android.view.View
@@ -46,12 +44,23 @@ class MatchupWidget : AppWidgetProvider() {
  */
 object Widget {
     private const val MAX_EVENTS = 10
-    private val EVENT_IDS = intArrayOf(
-        R.id.w_e1, R.id.w_e2, R.id.w_e3, R.id.w_e4, R.id.w_e5,
-        R.id.w_e6, R.id.w_e7, R.id.w_e8, R.id.w_e9, R.id.w_e10,
+    /** Each "Latest" row: container, my-team tag, opponent tag, text. Colors come from the layout,
+     *  so they follow the phone's light/dark setting instantly. */
+    private class EventRow(val row: Int, val me: Int, val opp: Int, val text: Int)
+    private val EVENT_ROWS = listOf(
+        EventRow(R.id.w_e1, R.id.w_e1_me, R.id.w_e1_opp, R.id.w_e1_t),
+        EventRow(R.id.w_e2, R.id.w_e2_me, R.id.w_e2_opp, R.id.w_e2_t),
+        EventRow(R.id.w_e3, R.id.w_e3_me, R.id.w_e3_opp, R.id.w_e3_t),
+        EventRow(R.id.w_e4, R.id.w_e4_me, R.id.w_e4_opp, R.id.w_e4_t),
+        EventRow(R.id.w_e5, R.id.w_e5_me, R.id.w_e5_opp, R.id.w_e5_t),
+        EventRow(R.id.w_e6, R.id.w_e6_me, R.id.w_e6_opp, R.id.w_e6_t),
+        EventRow(R.id.w_e7, R.id.w_e7_me, R.id.w_e7_opp, R.id.w_e7_t),
+        EventRow(R.id.w_e8, R.id.w_e8_me, R.id.w_e8_opp, R.id.w_e8_t),
+        EventRow(R.id.w_e9, R.id.w_e9_me, R.id.w_e9_opp, R.id.w_e9_t),
+        EventRow(R.id.w_e10, R.id.w_e10_me, R.id.w_e10_opp, R.id.w_e10_t),
     )
-    private const val YELLOW = 0xFFF2C230.toInt()
-    private const val MUTED = 0xFFA7B0BE.toInt()
+    /** Mid grey for the game context: readable on both the light and dark widget. */
+    private const val CONTEXT_GREY = 0xFF8C939E.toInt()
 
     // ---- Data ----
 
@@ -223,35 +232,39 @@ object Widget {
         }
         v.setViewVisibility(R.id.w_events, View.VISIBLE)
         val n = events?.length() ?: 0
-        for ((i, viewId) in EVENT_IDS.withIndex()) {
+        for ((i, r) in EVENT_ROWS.withIndex()) {
             when {
-                i >= lines -> v.setViewVisibility(viewId, View.GONE)
+                i >= lines -> v.setViewVisibility(r.row, View.GONE)
                 n == 0 && i == 0 -> {
-                    v.setTextViewText(viewId, "No plays yet this week")
-                    v.setViewVisibility(viewId, View.VISIBLE)
+                    v.setViewVisibility(r.me, View.GONE)
+                    v.setViewVisibility(r.opp, View.GONE)
+                    v.setTextViewText(r.text, "No plays yet this week")
+                    v.setViewVisibility(r.row, View.VISIBLE)
                 }
                 i < n -> {
-                    v.setTextViewText(viewId, eventLine(events!!.getJSONObject(i)))
-                    v.setViewVisibility(viewId, View.VISIBLE)
+                    val e = events!!.getJSONObject(i)
+                    val mine = e.optBoolean("mine")
+                    val tagView = if (mine) r.me else r.opp
+                    v.setTextViewText(tagView, e.optString("tag"))
+                    v.setViewVisibility(r.me, if (mine) View.VISIBLE else View.GONE)
+                    v.setViewVisibility(r.opp, if (mine) View.GONE else View.VISIBLE)
+                    v.setTextViewText(r.text, eventText(e))
+                    v.setViewVisibility(r.row, View.VISIBLE)
                 }
-                else -> v.setViewVisibility(viewId, View.GONE)
+                else -> v.setViewVisibility(r.row, View.GONE)
             }
         }
     }
 
-    /** "TEMU  Quinn Hughes: PP assist (+1 A)  NJD at NYR · P2 4:11", with team tag and context styled. */
-    private fun eventLine(e: JSONObject): CharSequence {
-        val b = SpannableStringBuilder()
-        val tag = e.optString("tag")
-        b.append(tag, StyleSpan(Typeface.BOLD), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-        b.setSpan(ForegroundColorSpan(if (e.optBoolean("mine")) YELLOW else MUTED), 0, tag.length, 0)
-        b.append("  ").append(e.optString("t"))
+    /** "Quinn Hughes: PP assist (+1 A)  NJD at NYR · P2 4:11", with the game context smaller and grey. */
+    private fun eventText(e: JSONObject): CharSequence {
+        val b = SpannableStringBuilder(e.optString("t"))
         val c = e.optString("c")
         if (c.isNotBlank()) {
             val start = b.length
             b.append("  ").append(c)
-            b.setSpan(ForegroundColorSpan(MUTED), start, b.length, 0)
-            b.setSpan(RelativeSizeSpan(0.85f), start, b.length, 0)
+            b.setSpan(ForegroundColorSpan(CONTEXT_GREY), start, b.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            b.setSpan(RelativeSizeSpan(0.85f), start, b.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
         return b
     }
