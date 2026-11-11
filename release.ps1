@@ -36,12 +36,14 @@ New-Item -ItemType Directory -Force dist | Out-Null
 Get-ChildItem dist | Remove-Item -Force
 $apkName = "DDHL-$name.apk"
 Copy-Item "app\build\outputs\apk\release\app-release.apk" "dist\$apkName" -Force
-[ordered]@{
+$json = [ordered]@{
     versionCode = $code
     versionName = $name
     apkUrl      = "https://github.com/$repo/releases/download/$tag/$apkName"
     notes       = $Notes
-} | ConvertTo-Json | Set-Content "dist\update.json" -Encoding utf8
+} | ConvertTo-Json
+# Plain UTF-8 without a byte-order mark (Windows PowerShell adds one by default, which breaks JSON readers).
+[IO.File]::WriteAllText((Join-Path $PSScriptRoot "dist\update.json"), $json, (New-Object Text.UTF8Encoding $false))
 
 if ($DryRun) { Write-Host "Built dist\$apkName and dist\update.json (not published)."; return }
 

@@ -34,7 +34,7 @@ object Updater {
     /** Returns the newer release, or null if up to date / not set up. */
     fun fetchNewer(ctx: Context): Release? {
         if (!enabled) return null
-        val j = JSONObject(DdhlApi.getText(Ddhl.UPDATE_MANIFEST_URL))
+        val j = JSONObject(DdhlApi.getText(Ddhl.UPDATE_MANIFEST_URL).trimStart('﻿'))
         val r = Release(
             versionCode = j.getLong("versionCode"),
             versionName = j.optString("versionName", j.getLong("versionCode").toString()),
