@@ -49,6 +49,14 @@
             android:exported="false" />
 
         <receiver
+            android:name=".AppUpdatedReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
             android:name=".MatchupWidget"
             android:exported="false"
             android:label="DDHL matchup">

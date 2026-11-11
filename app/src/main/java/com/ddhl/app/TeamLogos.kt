@@ -41,6 +41,8 @@ object TeamLogos {
             !f.exists() || System.currentTimeMillis() - f.lastModified() > MAX_AGE
         }
         if (missing.isEmpty()) return
+        // Tidy up logos saved by older versions at other sizes.
+        dir(ctx).listFiles()?.filter { !it.name.endsWith("_$SIZE.png") }?.forEach { it.delete() }
         val urls = try {
             logoUrls()
         } catch (e: Exception) {

@@ -4,6 +4,7 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.Typeface
 import android.os.Build
 import android.os.Bundle
@@ -59,8 +60,8 @@ object Widget {
         val m = info.mine ?: return
         TeamLogos.ensure(ctx, m.me, m.opp)
         val j = JSONObject()
-            .put("me", m.me.abbr).put("meRec", m.me.record)
-            .put("opp", m.opp.abbr).put("oppRec", m.opp.record)
+            .put("me", m.me.abbr).put("meRec", m.me.record).put("meName", m.me.name)
+            .put("opp", m.opp.abbr).put("oppRec", m.opp.record).put("oppName", m.opp.name)
             .put("state", m.me.state())
             .put("win", m.winChance ?: -1.0)
             .put("live", m.me.gamesInProgress)
@@ -111,23 +112,34 @@ object Widget {
 
     /** Builds views for one widget at its current size (every size it may show at, on Android 12+). */
     fun buildFor(ctx: Context, mgr: AppWidgetManager, id: Int): RemoteViews {
+        val state = Prefs(ctx).widgetState?.let { runCatching { JSONObject(it) }.getOrNull() }
+        // Load each logo once and share it across every size we build.
+        val logos = Logos(
+            state?.optString("me")?.ifEmpty { null }?.let { TeamLogos.cached(ctx, it) },
+            state?.optString("opp")?.ifEmpty { null }?.let { TeamLogos.cached(ctx, it) },
+        )
+        // Missing a logo (first run, new opponent, app update…): fetch it in the background.
+        if (state != null && (logos.me == null || logos.opp == null)) LogoWorker.request(ctx)
+
         val o = mgr.getAppWidgetOptions(id)
         if (Build.VERSION.SDK_INT >= 31) {
             val sizes = BundleCompat.getParcelableArrayList(o, AppWidgetManager.OPTION_APPWIDGET_SIZES, SizeF::class.java)
             if (!sizes.isNullOrEmpty()) {
-                return RemoteViews(sizes.distinct().take(8).associateWith { build(ctx, it.width, it.height) })
+                return RemoteViews(sizes.distinct().take(8).associateWith { build(ctx, state, logos, it.width, it.height) })
             }
         }
         // Older Android: portrait size is (min width, max height).
         val w = o.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH).takeIf { it > 0 } ?: 250
         val h = o.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT).takeIf { it > 0 } ?: 110
-        return build(ctx, w.toFloat(), h.toFloat())
+        return build(ctx, state, logos, w.toFloat(), h.toFloat())
     }
+
+    private class Logos(val me: Bitmap?, val opp: Bitmap?)
 
     private enum class Tier { COMPACT, STANDARD, LARGE }
 
     /** [w] and [h] are the widget's size in dp. */
-    fun build(ctx: Context, w: Float, h: Float): RemoteViews {
+    private fun build(ctx: Context, s: JSONObject?, logos: Logos, w: Float, h: Float): RemoteViews {
         val tier = when {
             h < 100f -> Tier.COMPACT
             h >= 200f && w >= 220f -> Tier.LARGE
@@ -140,7 +152,6 @@ object Widget {
         }
         val v = RemoteViews(ctx.packageName, layout)
         v.setOnClickPendingIntent(R.id.w_root, Notifier.openPage(ctx, 30, Ddhl.LIVE))
-        val s = Prefs(ctx).widgetState?.let { runCatching { JSONObject(it) }.getOrNull() }
         if (s == null) {
             v.setTextViewText(R.id.w_me, "DDHL")
             v.setTextViewText(R.id.w_status, "Open the app and pick your team")
@@ -175,8 +186,8 @@ object Widget {
         v.setTextViewText(R.id.w_me_rec, s.optString("meRec"))
         v.setTextViewText(R.id.w_opp, s.optString("opp"))
         v.setTextViewText(R.id.w_opp_rec, s.optString("oppRec"))
-        logo(ctx, v, R.id.w_me_logo, s.optString("me"), logoDp)
-        logo(ctx, v, R.id.w_opp_logo, s.optString("opp"), logoDp)
+        logo(v, R.id.w_me_logo, logos.me, logoDp)
+        logo(v, R.id.w_opp_logo, logos.opp, logoDp)
 
         val lead = when (s.optInt("state")) { 1 -> "Leading"; -1 -> "Trailing"; else -> "Tied" }
         val win = s.optDouble("win", -1.0)
@@ -245,8 +256,7 @@ object Widget {
         return b
     }
 
-    private fun logo(ctx: Context, v: RemoteViews, viewId: Int, abbr: String, sizeDp: Float) {
-        val bmp = if (abbr.isEmpty()) null else TeamLogos.cached(ctx, abbr)
+    private fun logo(v: RemoteViews, viewId: Int, bmp: Bitmap?, sizeDp: Float) {
         if (bmp == null) {
             v.setViewVisibility(viewId, View.GONE); return
         }
