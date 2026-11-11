@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ddhl_bg">#0A0D12</color>
+    <color name="ddhl_bar">#11151C</color>
+    <color name="ddhl_yellow">#F2C230</color>
+    <color name="ddhl_text">#FFFFFF</color>
+    <color name="ddhl_muted">#A7B0BE</color>
+</resources>

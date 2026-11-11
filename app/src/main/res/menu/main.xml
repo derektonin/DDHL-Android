@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/action_refresh" android:title="Refresh" app:showAsAction="never" />
+    <item android:id="@+id/action_alerts" android:title="Alert settings" app:showAsAction="never" />
+    <item android:id="@+id/action_live_mode" android:title="Start live mode now" app:showAsAction="never" />
+    <item android:id="@+id/action_battery" android:title="Keep alerts reliable (battery)" app:showAsAction="never" />
+    <item android:id="@+id/action_update" android:title="Check for app update" app:showAsAction="never" />
+    <item android:id="@+id/action_check_now" android:title="Check the site now" app:showAsAction="never" />
+    <item android:id="@+id/action_simulate" android:title="Test alerts (simulate updates)" app:showAsAction="never" />
+</menu>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.DDHL" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="colorPrimary">#11151C</item>
+        <item name="colorPrimaryDark">#0A0D12</item>
+        <item name="colorAccent">#F2C230</item>
+        <item name="android:statusBarColor">#0A0D12</item>
+        <item name="android:navigationBarColor">#0A0D12</item>
+        <item name="android:windowBackground">@color/ddhl_bg</item>
+    </style>
+</resources>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The site's certificate (Let's Encrypt) chains to "ISRG Root X2". Android 14+ trusts it already;
+  older phones may not, so we also trust a bundled copy. Thumbprint verified:
+  BDB1B93CD5978D45C6261455F8DB95C75AD153AF. No other certificates are trusted, and plain http is off.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="@raw/isrg_root_x2" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>
