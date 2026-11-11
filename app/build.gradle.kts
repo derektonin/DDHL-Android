@@ -21,8 +21,8 @@ android {
         minSdk = 26
         targetSdk = 35
         // Bump BOTH for every release you hand out (versionCode must always go up).
-        versionCode = 3
-        versionName = "0.3"
+        versionCode = 4
+        versionName = "0.4"
     }
 
     buildFeatures {

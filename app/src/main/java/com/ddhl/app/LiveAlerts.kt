@@ -145,11 +145,11 @@ object LiveAlerts {
     }
 
     /** "TEMU takes the lead in hits" -> "You take the lead in hits" for your own team. */
-    private fun personal(headline: String, me: String): String =
+    fun personal(headline: String, me: String): String =
         headline.replace(Regex("^" + Regex.escape(me) + " takes\\b"), "You take")
 
     /** {"G":1,"STP4":1} -> "+1 G, +1 STP4" */
-    private fun statsText(stats: List<Pair<String, Double>>): String =
+    fun statsText(stats: List<Pair<String, Double>>): String =
         stats.filter { it.second != 0.0 && !it.second.isNaN() }.joinToString(", ") { (k, v) ->
             val n = if (v == Math.floor(v)) v.toLong().toString() else "%.1f".format(v)
             (if (v > 0) "+" else "") + n + " " + k

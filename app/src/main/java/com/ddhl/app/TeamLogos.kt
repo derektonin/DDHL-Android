@@ -21,12 +21,12 @@ import java.util.concurrent.TimeUnit
  */
 object TeamLogos {
     private const val TAG = "DdhlLogos"
-    private const val SIZE = 144 // px; plenty for a ~32dp widget icon, small enough for widgets
+    private const val SIZE = 256 // px; sharp up to ~90dp in the large widget
     private val MAX_AGE = TimeUnit.DAYS.toMillis(7)
 
     private fun dir(ctx: Context) = File(ctx.filesDir, "logos").apply { mkdirs() }
     private fun fileFor(ctx: Context, abbr: String) =
-        File(dir(ctx), abbr.replace(Regex("[^A-Za-z0-9]"), "_") + ".png")
+        File(dir(ctx), abbr.replace(Regex("[^A-Za-z0-9]"), "_") + "_$SIZE.png")
 
     /** Cached logo for a team, or null if we don't have it yet. Safe on the main thread. */
     fun cached(ctx: Context, abbr: String): Bitmap? {
