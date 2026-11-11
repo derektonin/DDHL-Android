@@ -10,7 +10,8 @@ param(
     [string]$Notes = "",
     [switch]$DryRun
 )
-$ErrorActionPreference = "Stop"
+# "Continue": git/gh print normal progress on stderr; failures are caught via exit codes below.
+$ErrorActionPreference = "Continue"
 Set-Location $PSScriptRoot
 $repo = "derektonin/DDHL-Android"
 if (-not $env:JAVA_HOME) {
@@ -24,8 +25,8 @@ $name = [regex]::Match($gradle, 'versionName\s*=\s*"([^"]+)"').Groups[1].Value
 $tag = "v$name"
 
 if (-not $DryRun) {
-    $existing = gh release view $tag --repo $repo --json tagName 2>$null
-    if ($existing) { throw "Release $tag already exists. Bump versionCode/versionName in app\build.gradle.kts first." }
+    gh release view $tag --repo $repo --json tagName *> $null
+    if ($LASTEXITCODE -eq 0) { throw "Release $tag already exists. Bump versionCode/versionName in app\build.gradle.kts first." }
 }
 
 .\gradlew.bat assembleRelease --console=plain
